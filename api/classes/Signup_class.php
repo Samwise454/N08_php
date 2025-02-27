@@ -72,9 +72,23 @@
                     //we insert 
                     //let's hash the password 
                     $password = password_hash($pass_word, PASSWORD_DEFAULT);
+
                     $sql = "INSERT INTO users (firstname, lastname, nickname, email, tel, lastclass, house, password, img, token) VALUES (?,?,?,?,?,?,?,?,?,?);";
                     $stmt = $this->con()->prepare($sql);
                     $stmt->execute([$firstname, $lastname, $nickname, $email, $tel, $lastclass, $house, $password, $img, $token]);
+
+                    $bizname = "-";
+                    $desc = "-";
+                    $logo = "logo.jpg";
+                    $img1 = "img1.jpg";
+                    $img2 = "img2.jpg";
+                    $social = "-";
+
+                    //let's also insert some default data into biz data
+                    $sql = "INSERT INTO bizdata (email, bizname, bizdesc, bizlogo, bizimg1, bizimg2, social) VALUES (?,?,?,?,?,?,?);";
+                    $stmt = $this->con()->prepare($sql);
+                    $stmt->execute([$email, $bizname, $desc, $logo, $img1, $img2, $social]);
+
                     return $this->setMessage($this->success, "Signup Successful!");
                 }
             }

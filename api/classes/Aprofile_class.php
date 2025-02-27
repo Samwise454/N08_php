@@ -46,6 +46,7 @@
             }
             else {
                 foreach($result as $user) {
+                    $id = (int)$user["id"] * 36546;
                     $email = $user["email"];
                     $firstname = $user["firstname"];
                     $lastname = $user["lastname"];
@@ -57,6 +58,7 @@
 
                     $data = [
                         "code"=>"200",
+                        "id"=>$id,
                         "email"=>$email,
                         "firstname"=>$firstname,
                         "lastname"=>$lastname,

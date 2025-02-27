@@ -30,7 +30,7 @@
             else {
                 $all_user = [];
                 foreach($result as $user) {
-                    $id = $user["id"] * 36546;
+                    $id = (int)$user["id"] * 36546;
                     $nickname = $user["nickname"];
                     $img = $user["img"];
 
