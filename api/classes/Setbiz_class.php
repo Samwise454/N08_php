@@ -54,7 +54,7 @@
                     $old_file = '../images/bizdata/'.$old_img;
 
                     $allowed_ext = ["png", "jpg", "jpeg"];
-                    $filename = $formData["name"];
+                    $filename = strtolower($formData["name"]);
                     $mimetype = $formData["type"];
                     $size = $formData["size"];
                     $random_num = rand(0000, 9999);
