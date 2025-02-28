@@ -18,6 +18,9 @@
             if (!preg_match("/^[0-9+]*$/", $tel)) {
                 return false;
             }
+            else if (!str_contains($tel, "+")) {
+                return "edit";
+            }
             else if (str_contains($tel, '+234') && mb_strlen($tel) !== 14) {
                 return false;
             }
@@ -29,11 +32,13 @@
             }
         }
         
-        public function getSignup($firstname, $lastname, $nickname, $email, $tel, $lastclass, $house, $pass_word, $img) {
+        public function getSignup($firstname, $lastname, $nickname, $email, $tel, $quest, $lastclass, $house, $pass_word, $img) {
             $lastclass_array = ["Blue", "Green", "Purple", "Violet", "White", "Yellow"];
             $house_array = ["Anambra", "Benue", "Imo", "Niger"];
             $img = 'profile.jpg';
             $token = bin2hex(openssl_random_pseudo_bytes(32));
+            $quest = strtolower($quest);
+            $quest_array = ["fedecol nise prounitate", "fedecolniseprounitate", "fedecol nise pro-unitate"];
 
             if (empty($firstname) || empty($lastname) || empty($nickname) || empty($email) || empty($tel) || empty($lastclass) || empty($house) || empty($pass_word)) {
                 return $this->setMessage($this->code, "Check for empty field(s)");
@@ -47,6 +52,9 @@
             else if ($this->check_tel($tel) == false) {
                 return $this->setMessage($this->code, "Invalid phone number!");
             }
+            else if ($this->check_tel($tel) == "edit") {
+                return $this->setMessage($this->code, "Add your country code eg [+2348102800000]");
+            }
             else if (!in_array($lastclass, $lastclass_array)) {
                 return $this->setMessage($this->code, "Invalid class!");
             }
@@ -55,6 +63,9 @@
             }
             else if (mb_strlen($pass_word) < 6) {
                 return $this->setMessage($this->code, "Password must be at least 6 characters!");
+            }
+            else if (!in_array($quest, $quest_array)) {
+                return $this->setMessage($this->code, "Hmmm, try again with the anthem!");
             }
             else {
                 //we check whether email, tel or nickname has been used before 

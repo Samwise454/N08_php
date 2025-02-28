@@ -12,6 +12,7 @@
         $nickname = ucfirst($data["nickname"]);
         $email = $data["email"];
         $tel = $data["tel"];
+        $quest = $data["quest"];
         $lastclass = ucfirst($data["lastclass"]);
         $house = ucfirst($data["house"]);
         $pass_word = $data["password"];
@@ -28,5 +29,5 @@
         }
 
         $signup = new Signup();
-        echo json_encode($signup->getSignup($firstname, $lastname, $nickname, $email, $tel, $lastclass, $house, $pass_word, $img));
+        echo json_encode($signup->getSignup($firstname, $lastname, $nickname, $email, $tel, $quest, $lastclass, $house, $pass_word, $img));
     }
