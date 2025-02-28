@@ -53,15 +53,15 @@
                     $old_img = $data[0][$which_image];
                     $old_file = '../images/bizdata/'.$old_img;
 
-                    $allowed_ext = ["png", "jpg", "jpeg"];
-                    $filename = strtolower($formData["name"]);
+                    $allowed_ext = ["png", "jpg", "jpeg", "PNG", "JPG", "JPEG"];
+                    $filename = $formData["name"];
                     $mimetype = $formData["type"];
                     $size = $formData["size"];
                     $random_num = rand(0000, 9999);
                     $tmp_path = $formData["tmp_name"];
 
-                    $file_ext = explode(".", $filename)[1];
-                    $file_type = explode("/", $mimetype)[1];
+                    $file_ext = strtolower(explode(".", $filename)[1]);
+                    $file_type = strtolower(explode("/", $mimetype)[1]);
 
                     $originalname = explode(".", $filename)[0];
                     $new_filename = $originalname."_".$random_num.".".$file_ext;
