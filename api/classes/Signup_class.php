@@ -14,22 +14,15 @@
             return $call_note;
         }
 
-        public function check_tel($tel) {
-            if (!preg_match("/^[0-9+]*$/", $tel)) {
-                return false;
+        public function shuffleArray($array) {
+            $array_keys = array_keys($array);//collect all array keys
+            shuffle($array_keys);
+            $shuffled_array = [];
+            foreach($array_keys as $key) {
+                $shuffled = $array[$key];
+                array_push($shuffled_array, $shuffled);
             }
-            else if (!str_contains($tel, "+")) {
-                return "edit";
-            }
-            else if (str_contains($tel, '+234') && mb_strlen($tel) !== 14) {
-                return false;
-            }
-            else if (mb_strlen($tel) > 14) {
-                return false;
-            }
-            else {
-                return true;
-            }
+            return $shuffled_array;
         }
         
         public function getSignup($firstname, $lastname, $nickname, $email, $tel, $quest, $lastclass, $house, $pass_word, $img) {
@@ -49,10 +42,13 @@
             else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return $this->setMessage($this->code, "Invalid email address");
             }
-            else if ($this->check_tel($tel) == false) {
+            else if (mb_strlen($tel) > 14) {
                 return $this->setMessage($this->code, "Invalid phone number!");
             }
-            else if ($this->check_tel($tel) == "edit") {
+            else if (!preg_match("/^[0-9+]*$/", $tel)) {
+                return $this->setMessage($this->code, "Invalid phone number!");
+            }
+            else if (!str_contains($tel, "+")) {
                 return $this->setMessage($this->code, "Add your country code eg [+2348102800000]");
             }
             else if (!in_array($lastclass, $lastclass_array)) {

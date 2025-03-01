@@ -42,7 +42,9 @@
                     ];
                     array_push($all_user, $data);
                 }
-                return $all_user;
+
+                $shuffled_array = $this->shuffleArray($all_user);
+                return $shuffled_array;
             }
         }
     }

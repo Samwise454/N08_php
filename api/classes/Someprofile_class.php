@@ -6,14 +6,6 @@
         public $code = "400";
         public $success = "200";
 
-        // public function setMessage($code, $note) {
-        //     $call_note = [
-        //         "code"=>$code,
-        //         "note"=>$note
-        //     ];
-        //     return $call_note;
-        // }
-
         public function getProfile($main, $sub) {
             //main is like class, house, brand or general
             //sub is like house color or class color
@@ -116,7 +108,8 @@
                     }
                     array_push($all_user, $data);
                 }
-                return $all_user;
+                $shuffled_array = $this->shuffleArray($all_user);
+                return $shuffled_array;
             }
         }
     }

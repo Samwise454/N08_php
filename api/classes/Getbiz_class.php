@@ -138,7 +138,8 @@
                         ];
                         array_push($all_data, $data);
                     }
-                    return $all_data;
+                    $shuffled_array = $this->shuffleArray($all_data);
+                    return $shuffled_array;
                 }
                 else {
                     $note = "Data not found";
