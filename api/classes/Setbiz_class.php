@@ -49,62 +49,84 @@
                 $count_data = count($data);//to check whether data has been added before or not
 
                 if ($count_data > 0) {
-                    //bizdata exists
-                    $old_img = $data[0][$which_image];
-                    $old_file = '../images/bizdata/'.$old_img;
+                    if (!empty($formData)) {
+                        //bizdata exists
+                        $old_img = $data[0][$which_image];
+                        $old_file = '../images/bizdata/'.$old_img;
 
-                    $allowed_ext = ["png", "jpg", "jpeg", "PNG", "JPG", "JPEG"];
-                    $filename = $formData["name"];
-                    $mimetype = $formData["type"];
-                    $size = $formData["size"];
-                    $random_num = rand(0000, 9999);
-                    $tmp_path = $formData["tmp_name"];
+                        $allowed_ext = ["png", "jpg", "jpeg", "PNG", "JPG", "JPEG"];
+                        $filename = $formData["name"];
+                        $mimetype = $formData["type"];
+                        $size = $formData["size"];
+                        $random_num = rand(0000, 9999);
+                        $tmp_path = $formData["tmp_name"];
 
-                    $file_ext = strtolower(explode(".", $filename)[1]);
-                    $file_type = strtolower(explode("/", $mimetype)[1]);
+                        $file_ext = strtolower(explode(".", $filename)[1]);
+                        $file_type = strtolower(explode("/", $mimetype)[1]);
 
-                    $originalname = explode(".", $filename)[0];
-                    $new_filename = $originalname."_".$random_num.".".$file_ext;
-                    $target_path = '../images/bizdata/'.$new_filename;
-                    
-                    if (!in_array($file_ext, $allowed_ext)) {
-                        return "bad_ext";
-                    }
-                    else if (!in_array($file_type, $allowed_ext)) {
-                        return "bad_file";
-                    }
-                    else if ($size > 2000000) {
-                        return "bad_size";
+                        $originalname = explode(".", $filename)[0];
+                        $new_filename = $originalname."_".$random_num.".".$file_ext;
+                        $target_path = '../images/bizdata/'.$new_filename;
+                        
+                        if (!in_array($file_ext, $allowed_ext)) {
+                            return "bad_ext";
+                        }
+                        else if (!in_array($file_type, $allowed_ext)) {
+                            return "bad_file";
+                        }
+                        else if ($size > 2000000) {
+                            return "bad_size";
+                        }
+                        else {
+                            //before update image name, let's get the name and delete old image if exists
+                            if ($old_img !== '' && $old_img !== "img1.jpg" && $old_img !== "img2.jpg" && $old_img !== "logo.jpg") {
+                                //we delete the file that matches the profile
+                                unlink($old_file);
+                            }
+
+                            //let's update database with new filename
+                            $sql = "UPDATE bizdata SET $which_image=? WHERE email=?;";
+                            $stmt = $this->con()->prepare($sql);
+                            $stmt->execute([$new_filename, $email]);
+
+                            move_uploaded_file($tmp_path, $target_path);
+                            return true;
+                        }
                     }
                     else {
-                        //before update image name, let's get the name and delete old image if exists
-                        if ($old_img !== '' && $old_img !== "img1.jpg" && $old_img !== "img2.jpg" && $old_img !== "logo.jpg") {
-                            //we delete the file that matches the profile
-                            unlink($old_file);
-                        }
-
-                        //let's update database with new filename
-                        $sql = "UPDATE bizdata SET $which_image=? WHERE email=?;";
-                        $stmt = $this->con()->prepare($sql);
-                        $stmt->execute([$new_filename, $email]);
-
-                        move_uploaded_file($tmp_path, $target_path);
+                        //we are returning true here because it means no image was uploaded
                         return true;
                     }
                 }
             }
         }
 
-        public function setBizData($auth, $bizname, $desc) {
-            if(empty($bizname) || empty($desc)) {
-                $note = "Check for empty input(s)";
-                return $this->setMessage($this->code, $note);
+        public function runSql($bizname, $desc, $email) {
+            $sql = '';
+            if(!empty($bizname) && empty($desc)) {
+                $sql = "UPDATE bizdata SET bizname=? WHERE email=?;";
+                $stmt = $this->con()->prepare($sql);
+                $stmt->execute([$bizname, $email]);
             }
-            else if (empty($auth)) {
+            else if (empty($biname) && !empty($desc)) {
+                $sql = "UPDATE bizdata SET bizdesc=? WHERE email=?;";
+                $stmt = $this->con()->prepare($sql);
+                $stmt->execute([$desc, $email]);
+            }
+            else if (!empty($biname) && !empty($desc)) {
+                $sql = "UPDATE bizdata SET bizname=?, bizdesc=? WHERE email=?;";
+                $stmt = $this->con()->prepare($sql);
+                $stmt->execute([$bizname, $desc, $email]);
+            }
+            return true;
+        }
+
+        public function setBizData($auth, $bizname, $desc) {
+            if (empty($auth)) {
                 $note = "Error processing";
                 return $this->setMessage($this->code, $note);
             }
-            else if (mb_strlen($desc) > 600) {
+            else if (!empty($desc) && mb_strlen($desc) > 600) {
                 $note = "Description too long! (max 600)";
                 return $this->setMessage($this->code, $note);
             }
@@ -113,7 +135,7 @@
                 $check_auth = $this->checkAuth($auth);//result from checking token
                 if ($check_auth === false) {
                     //auth not found or not legit
-                    $note = "Error processing";
+                    $note = "Error processing2";
                     return $this->setMessage($this->code, $note);
                 }
                 else {
@@ -130,12 +152,13 @@
 
                     if ($count_result > 0) {
                         //means data has been added before therefore we update
-                        $sql = "UPDATE bizdata SET bizname=?, bizdesc=? WHERE email=?;";
-                        $stmt = $this->con()->prepare($sql);
-                        $stmt->execute([$bizname, $desc, $email]);
+                        
+                        $bizdata_update = $this->runSql($bizname, $desc, $email);
 
-                        $note = "Done";
-                        return $this->setMessage($this->success, $note);
+                        if ($bizdata_update == true) {
+                            $note = "Done";
+                            return $this->setMessage($this->success, $note);
+                        }
                     }
                     else {
                         //we insert
@@ -157,11 +180,7 @@
 
         public function setBizImg($auth, $logo, $img1, $img2) {
             //now we want to upload these 3 images logo, img1 and img2
-            if (empty($logo["name"]) || empty($img1) || empty($img2)) {
-                $note = "Check for empty image input(s)";
-                return $this->setMessage($this->code, $note);
-            }
-            else if (empty($auth)) {
+            if (empty($auth)) {
                 $note = "Error processing!";
                 return $this->setMessage($this->code, $note);
             }
@@ -187,12 +206,13 @@
                     return $this->setMessage($this->code, $note);
                 }
                 else if ($logo_upload === true && $img1_upload === true && $img2_upload === true) {
-                    $note = "Upload Successful!";
+                    $note = "Data Updated!";
                     return $this->setMessage($this->success, $note);
                 }
                 else {
+
                     $note = "Error processing";
-                    return $this->setMessage($this->success, $note);
+                    return $this->setMessage($this->code, $note);
                 }
             }
         }

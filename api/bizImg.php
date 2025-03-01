@@ -10,9 +10,27 @@
 
     if ($method === "POST") {
         $auth = explode(" ", $headers["Authorization"])[1];
-        $logo = $_FILES["logo"];
-        $img1 = $_FILES["img1"];
-        $img2 = $_FILES["img2"];
+
+        if (isset($FILES["logo"])) {
+            $logo = $_FILES["logo"];
+        }
+        else {
+            $logo = "";
+        }
+
+        if (isset($_FILES["img1"])) {
+            $img1 = $_FILES["img1"];
+        }
+        else {
+            $img1 = "";
+        }
+        
+        if (isset($_FILES["img2"])) {
+            $img2 = $_FILES["img2"];
+        }
+        else {
+            $img2 = "";
+        }
         
         $get_profile = new Setbiz();
         echo json_encode($get_profile->setBizImg($auth, $logo, $img1, $img2));
