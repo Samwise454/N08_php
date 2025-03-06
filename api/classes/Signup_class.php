@@ -95,7 +95,7 @@
                     $img2 = "img2.jpg";
 
                     //let's also insert some default data into biz data
-                    $sql = "INSERT INTO bizdata (email, bizname, bizdesc, bizlogo, bizimg1, bizimg2) VALUES (?,?,?,?,?,?;";
+                    $sql = "INSERT INTO bizdata (email, bizname, bizdesc, bizlogo, bizimg1, bizimg2) VALUES (?,?,?,?,?,?);";
                     $stmt = $this->con()->prepare($sql);
                     $stmt->execute([$email, $bizname, $desc, $logo, $img1, $img2]);
 
