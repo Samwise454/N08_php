@@ -57,6 +57,7 @@
             else {
                 foreach($result as $user) {
                     $data = [];
+                    $email = $user["email"];
 
                     if ($main === "class" || $main === "house" || $main === "general") {
                         $id = (int)$user["id"] * 36546;
@@ -83,30 +84,32 @@
                         ];   
                     }
                     else if ($main === "brand") {
-                        $email = $user["email"];
+                        // $email = $user["email"];
 
                         //using the email, let's fetch the id
-                        $sql = "SELECT * FROM users;";
+                        $sql = "SELECT * FROM users WHERE email=?;";
                         $stmt = $this->con()->prepare($sql);
-                        $stmt->execute();
+                        $stmt->execute([$email]);
                         $user_data = $stmt->fetchAll();
-                        
-                        $id = (int)$user_data[0]["id"] * 36546;
-                        $bizname = $user["bizname"];
-                        $img = $user["bizlogo"];
 
-                        if (mb_strlen($bizname > 12)) {
-                            $bizname = substr($bizname, 0, 12) . '...';
+                        foreach($user_data as $use) {
+                            $id = (int)$use["id"] * 36546;
+                            $bizname = $user["bizname"];
+                            $img = $user["bizlogo"];
+
+                            if (mb_strlen($bizname > 12)) {
+                                $bizname = substr($bizname, 0, 12) . '...';
+                            }
+    
+                            $data = [
+                                "code"=>"200",
+                                "id"=>$id,
+                                "bizname"=>$bizname,
+                                "img"=>$img
+                            ];
                         }
-
-                        $data = [
-                            "code"=>"200",
-                            "id"=>$id,
-                            "bizname"=>$bizname,
-                            "img"=>$img
-                        ];
+                        array_push($all_user, $data);
                     }
-                    array_push($all_user, $data);
                 }
                 $shuffled_array = $this->shuffleArray($all_user);
                 return $shuffled_array;

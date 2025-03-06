@@ -25,18 +25,19 @@
             return $shuffled_array;
         }
         
-        public function getSignup($firstname, $lastname, $nickname, $email, $tel, $quest, $lastclass, $house, $pass_word, $img) {
+        public function getSignup($firstname, $lastname, $nickname, $email, $tel, $quest, $lastclass, $house, $pass_word, $confirm_password, $img) {
             $lastclass_array = ["Blue", "Green", "Purple", "Violet", "White", "Yellow"];
             $house_array = ["Anambra", "Benue", "Imo", "Niger"];
             $img = 'profile.jpg';
             $token = bin2hex(openssl_random_pseudo_bytes(32));
             $quest = strtolower($quest);
-            $quest_array = ["fedecol nise prounitate", "fedecolniseprounitate", "fedecol nise pro-unitate"];
+            $quest_data = "#fgcn08*allow";
+            $socials = "-";
 
             if (empty($firstname) || empty($lastname) || empty($nickname) || empty($email) || empty($tel) || empty($lastclass) || empty($house) || empty($pass_word)) {
                 return $this->setMessage($this->code, "Check for empty field(s)");
             }
-            else if (!preg_match("/^[a-zA-Z]*$/", $firstname) || !preg_match("/^[a-zA-Z]*$/", $lastname) || !preg_match("/^[a-zA-Z0-9]*$/", $nickname)) {
+            else if (!preg_match("/^[a-zA-Z- ]*$/", $firstname) || !preg_match("/^[a-zA-Z- ]*$/", $lastname) || !preg_match("/^[a-zA-Z0-9- ]*$/", $nickname)) {
                 return $this->setMessage($this->code, "Invalid name(s)");
             }
             else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -60,8 +61,11 @@
             else if (mb_strlen($pass_word) < 6) {
                 return $this->setMessage($this->code, "Password must be at least 6 characters!");
             }
-            else if (!in_array($quest, $quest_array)) {
-                return $this->setMessage($this->code, "Hmmm, try again with the anthem!");
+            else if ($pass_word !== $confirm_password) {
+                return $this->setMessage($this->code, "Password is not a match!");
+            }
+            else if ($quest !== $quest_data) {
+                return $this->setMessage($this->code, "Hmmm, try again with the key!");
             }
             else {
                 //we check whether email, tel or nickname has been used before 
@@ -80,21 +84,20 @@
                     //let's hash the password 
                     $password = password_hash($pass_word, PASSWORD_DEFAULT);
 
-                    $sql = "INSERT INTO users (firstname, lastname, nickname, email, tel, lastclass, house, password, img, token) VALUES (?,?,?,?,?,?,?,?,?,?);";
+                    $sql = "INSERT INTO users (firstname, lastname, nickname, email, tel, lastclass, house, password, img, token, twitter, insta, facebook, linkedin, youtube) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
                     $stmt = $this->con()->prepare($sql);
-                    $stmt->execute([$firstname, $lastname, $nickname, $email, $tel, $lastclass, $house, $password, $img, $token]);
+                    $stmt->execute([$firstname, $lastname, $nickname, $email, $tel, $lastclass, $house, $password, $img, $token, $socials, $socials, $socials, $socials, $socials]);
 
                     $bizname = "-";
                     $desc = "-";
                     $logo = "logo.jpg";
                     $img1 = "img1.jpg";
                     $img2 = "img2.jpg";
-                    $social = "-";
 
                     //let's also insert some default data into biz data
-                    $sql = "INSERT INTO bizdata (email, bizname, bizdesc, bizlogo, bizimg1, bizimg2, social) VALUES (?,?,?,?,?,?,?);";
+                    $sql = "INSERT INTO bizdata (email, bizname, bizdesc, bizlogo, bizimg1, bizimg2) VALUES (?,?,?,?,?,?;";
                     $stmt = $this->con()->prepare($sql);
-                    $stmt->execute([$email, $bizname, $desc, $logo, $img1, $img2, $social]);
+                    $stmt->execute([$email, $bizname, $desc, $logo, $img1, $img2]);
 
                     return $this->setMessage($this->success, "Signup Successful!");
                 }

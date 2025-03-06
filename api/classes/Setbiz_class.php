@@ -95,7 +95,7 @@
                     }
                     else {
                         //we are returning true here because it means no image was uploaded
-                        return true;
+                        return "no_image";
                     }
                 }
             }
@@ -204,6 +204,10 @@
                 else if ($logo_upload === "bad_size" || $img1_upload === "bad_size" || $img2_upload === "bad_size") {
                     $note = "File should be <= 2mb";
                     return $this->setMessage($this->code, $note);
+                }
+                else if ($logo_upload === "no_image" && $img1_upload === "no_image" && $img2_upload === "no_image") {
+                    $note = "Data updated but No image uploaded";
+                    return $this->setMessage($this->success, $note);
                 }
                 else if ($logo_upload === true && $img1_upload === true && $img2_upload === true) {
                     $note = "Data Updated!";

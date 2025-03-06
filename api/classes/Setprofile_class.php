@@ -14,8 +14,8 @@
             return $call_note;
         }
 
-        public function setProfile($auth, $formData) {
-            if(empty($auth) || empty($formData)) {
+        public function setProfile($auth, $base64) {
+            if(empty($auth) || empty($base64)) {
                 $note = "Error processing";
                 return $this->setMessage($this->code, $note);
             }
@@ -34,47 +34,40 @@
                     $old_file = '../images/profile/'.$result[0]["img"];
 
                     $allowed_ext = ["png", "jpg", "jpeg"];
-                    $filename = $formData["name"];
-                    $mimetype = $formData["type"];
-                    $size = $formData["size"];
-                    $random_num = rand(0000, 9999);
-                    $tmp_path = $formData["tmp_name"];
+                    $random_num = rand(000000, 999999);
+                    $image = imagecreatefromstring($base64);
 
-                    $file_ext = explode(".", $filename)[1];
-                    $file_type = explode("/", $mimetype)[1];
-
-                    $originalname = explode(".", $filename)[0];
-                    $new_filename = $originalname."_".$random_num.".".$file_ext;
-                    $target_path = '../images/profile/'.$new_filename;
-                    
-                    if (!in_array($file_ext, $allowed_ext)) {
-                        $note = "Invalid file (jpg, png and jpeg)";
-                        return $this->setMessage($this->code, $note);
-                    }
-                    else if (!in_array($file_type, $allowed_ext)) {
-                        $note = "Invalid file (jpg, png and jpeg)";
-                        return $this->setMessage($this->code, $note);
-                    }
-                    else if ($size > 2000000) {
-                        $note = "File should be <= 2mb";
-                        return $this->setMessage($this->code, $note);
+                    if (!$image) {
+                        return "No Image";
                     }
                     else {
-                        //before update image name, let's get the name and delete old image if exists
-                        if ($old_img !== 'profile.jpg') {
-                            //we delete the file that matches the profile
-                            unlink($old_file);
+                        $image_data = getimagesizefromstring($base64);//this containes image width and height and also mime "image/jpeg"
+                        $file_ext = explode("/", $image_data["mime"])[1];// eg jpeg or png
+                        $filename = "profile_".$random_num.".png";
+
+                        if (!in_array($file_ext, $allowed_ext)) {
+                            $note = "Invalid file (jpg, png and jpeg)";
+                            return $this->setMessage($this->code, $note);
                         }
+                        else {
+                            if ($old_img !== 'profile.jpg') {
+                                //we delete the file that matches the profile
+                                unlink($old_file);
+                            }
 
-                        //let's update database with new filename
-                        $sql = "UPDATE users SET img=? WHERE token=?;";
-                        $stmt = $this->con()->prepare($sql);
-                        $stmt->execute([$new_filename, $auth]);
+                            //let's update database with new filename
+                            $sql = "UPDATE users SET img=? WHERE token=?;";
+                            $stmt = $this->con()->prepare($sql);
+                            $stmt->execute([$filename, $auth]);
 
-                        move_uploaded_file($tmp_path, $target_path);
-                        $note = "Upload Successful!";
-                        return $this->setMessage($this->success, $note);
-                    }
+                            //let's specify target path, compress the image and upload  
+                            $image_file = '../images/profile/'.$filename;
+                            imagepng($image, $image_file, 0);
+
+                            $note = "Upload Successful!";
+                            return $this->setMessage($this->success, $note);
+                        }
+                    }   
                 }
                 else {
                     $note = "Error processing";

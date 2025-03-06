@@ -55,6 +55,11 @@
                     $house = $user["house"];
                     $tel = $user["tel"];
                     $img = $user["img"];
+                    $twitter = $user["twitter"];
+                    $insta = $user["insta"];
+                    $facebook = $user["facebook"];
+                    $linkedin = $user["linkedin"];
+                    $youtube = $user["youtube"];
 
                     $data = [
                         "code"=>"200",
@@ -66,7 +71,12 @@
                         "lastclass"=>$lastclass,
                         "house"=>$house,
                         "tel"=>$tel,
-                        "img"=>$img
+                        "img"=>$img,
+                        "twitter"=>$twitter,
+                        "insta"=>$insta,
+                        "facebook"=>$facebook,
+                        "linkedin"=>$linkedin,
+                        "youtube"=>$youtube
                     ];
                     array_push($all_user, $data);
                 }
