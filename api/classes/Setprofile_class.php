@@ -31,14 +31,15 @@
                     //legit auth 
                     //therefore we will be uploading image where auth is a match
                     $old_img = $result[0]["img"];
-                    $old_file = '../images/profile/'.$result[0]["img"];
+                    $old_file = '../images/profile/'.$old_img;
 
                     $allowed_ext = ["png", "jpg", "jpeg"];
                     $random_num = rand(000000, 999999);
                     $image = imagecreatefromstring($base64);
 
                     if (!$image) {
-                        return "No Image";
+                        $note = "No image";
+                        return $this->setMessage($this->code, $note);
                     }
                     else {
                         $image_data = getimagesizefromstring($base64);//this containes image width and height and also mime "image/jpeg"

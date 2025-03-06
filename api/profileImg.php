@@ -29,7 +29,6 @@
         $image = explode(",", $image_data)[1];//this will give us the actual base 64 file
         $base64 = base64_decode($image);
         
-        // echo json_encode($formData);exit();
         $get_profile = new Setprofile();
         echo json_encode($get_profile->setProfile($auth, $base64));
     }
