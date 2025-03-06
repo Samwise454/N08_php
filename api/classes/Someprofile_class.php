@@ -81,7 +81,8 @@
                             "house"=>$house,
                             "tel"=>$tel,
                             "img"=>$img
-                        ];   
+                        ]; 
+                        array_push($all_user, $data);  
                     }
                     else if ($main === "brand") {
                         // $email = $user["email"];
