@@ -103,7 +103,15 @@
                 return $all_data;
             }
             else {
-                $sql = "SELECT * FROM bizdata WHERE bizdesc LIKE '%$keyword%';";
+                $keyword = strtolower($keyword);
+                $sql = "";
+                if ($keyword == "all") {
+                    $sql = "SELECT * FROM bizdata;";
+                }
+                else {
+                    $sql = "SELECT * FROM bizdata WHERE bizdesc LIKE '%$keyword%';";
+                }
+                
                 $stmt = $this->con()->prepare($sql);
                 $stmt->execute();
                 $result = $stmt->fetchAll();
